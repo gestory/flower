@@ -7,7 +7,7 @@ from kivy.uix.floatlayout import FloatLayout
 
 from glob import glob
 from math import sin, cos, pi
-from random import choice, randint
+from random import choice, randint, shuffle
 
 ANIMALS = [animal for animal in glob('./images/*') if '.png' in animal]
 SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if '.ogg' in sound]
@@ -21,8 +21,19 @@ class Flower(App):
         self.decoys = set()
         self.pictures_rel_size = 0.5
         self.step = 1
+        self.level = 1
     
     def new_game(self):
+        if self.step == 20:
+            self.step = 0
+            self.pictures_rel_size = 0.5
+            self.level += 1
+            if self.level == 4:
+                self.step = 10
+                self.pictures_rel_size = 0.25
+            if self.level == 5:
+                self.stop()
+                return
         self.root.new_game()
         self.step += 1
         if not self.step % 5:
@@ -85,18 +96,55 @@ class Petal(FloatLayout):
     
     
 class PetalButton(Button):
+    @staticmethod
+    def get_pictures(decoys, quantity):
+        pictures = []
+        for i in range(quantity):
+            pictures.append(choice(decoys))
+        return pictures
+    
+    def draw_several_pictures(self, app, size, quantity, radius):
+        if app.key_petal == self.parent.index:
+            pictures = [ANIMALS[app.key]]
+            pictures += self.get_pictures(list(app.decoys), quantity-1)
+        else:
+            pictures = self.get_pictures(list(app.decoys), quantity)
+        shuffle(pictures)
+        with self.canvas:
+            self.bg = Rectangle(source=pictures.pop(), pos=self.center, size=size)
+            for i in range(quantity-1):
+                pos = (self.center[0] + self.size[0] * cos(2 * pi * i / (quantity-1)) * radius,
+                       self.center[1] + self.size[1] * sin(2 * pi * i / (quantity-1)) * radius)
+                self.bg = Rectangle(source=pictures.pop(), pos=pos, size=size)
+
+    def draw_one_picture(self, app, size):
+        self.draw_several_pictures(app, size, 1, None)
+    
+    def draw_four_pictures(self, app, size):
+        self.draw_several_pictures(app, size, 4, .3)
+        
+    def draw_seven_pictures(self, app, size):
+        self.draw_several_pictures(app, size, 7, .33)
+        
+    def draw_ten_pictures(self, app, size):
+        self.draw_several_pictures(app, size, 10, .35)
+    
     def new_game(self):
         app = App.get_running_app()
         size = (app.pictures_rel_size*self.width, app.pictures_rel_size*self.height)
-        print(size)
         self.canvas.clear()
-        with self.canvas:
-            if App.get_running_app().key_petal == self.parent.index or self.parent.index == -1:
-                self.bg = Rectangle(source=ANIMALS[app.key],
-                                    pos=self.center, size=size)
-            else:
-                self.bg = Rectangle(source=choice(list(app.decoys)),
-                                    pos=self.center, size=size)
+        if self.parent.index == -1:
+            with self.canvas:
+                self.bg = Rectangle(source=ANIMALS[app.key], pos=self.center, size=size)
+        else:
+            if app.level == 1:
+                self.draw_one_picture(app, size)
+            elif app.level == 2:
+                self.draw_four_pictures(app, size)
+            elif app.level == 3:
+                self.draw_seven_pictures(app, size)
+            elif app.level == 4:
+                self.draw_ten_pictures(app, size)
     
     def on_press(self):
         app = App.get_running_app()

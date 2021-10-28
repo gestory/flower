@@ -19,9 +19,14 @@ class Flower(App):
         self.key = None
         self.key_petal = None
         self.decoys = set()
+        self.pictures_rel_size = 0.5
+        self.step = 1
     
     def new_game(self):
         self.root.new_game()
+        self.step += 1
+        if not self.step % 5:
+            self.pictures_rel_size *= 0.8
     
     def build(self):
         root = RootLayout(size=Window.size, pos=(-0.2*Window.size[0], -0.2*Window.size[1]))
@@ -29,8 +34,8 @@ class Flower(App):
         for i in range(quantity):
             x = root.center[0] + root.size[0]*cos(2*pi*i/quantity) * 0.3
             y = root.center[1] + root.size[1]*sin(2*pi*i/quantity) * 0.3
-            root.add_widget(Petal(index=i, text="Petal #{}".format(i), size_hint=(.25, .25), pos=(x, y)))
-        root.add_widget(Petal(text="Center", size_hint=(.25, .25), pos=root.center))
+            root.add_widget(Petal(index=i, size_hint=(.25, .25), pos=(x, y)))
+        root.add_widget(Petal(size_hint=(.25, .25), pos=root.center))
         return root
 
 
@@ -45,9 +50,10 @@ class RootLayout(FloatLayout):
         self.size = Window.size
         
     def new_game(self):
-        App.get_running_app().key = randint(0, len(ANIMALS)-1)
-        App.get_running_app().key_petal = randint(0, len(self.children)-2)
-        App.get_running_app().decoys = set(ANIMALS).difference([ANIMALS[App.get_running_app().key]])
+        app = App.get_running_app()
+        app.key = randint(0, len(ANIMALS)-1)
+        app.key_petal = randint(0, len(self.children)-2)
+        app.decoys = set(ANIMALS).difference([ANIMALS[app.key]])
         for children in self.children:
             children.new_game()
 
@@ -80,22 +86,26 @@ class Petal(FloatLayout):
     
 class PetalButton(Button):
     def new_game(self):
+        app = App.get_running_app()
+        size = (app.pictures_rel_size*self.width, app.pictures_rel_size*self.height)
+        print(size)
         self.canvas.clear()
         with self.canvas:
             if App.get_running_app().key_petal == self.parent.index or self.parent.index == -1:
-                self.bg = Rectangle(source=ANIMALS[App.get_running_app().key],
-                                    pos=self.center, size_hint=(0.5, 0.5))
+                self.bg = Rectangle(source=ANIMALS[app.key],
+                                    pos=self.center, size=size)
             else:
-                self.bg = Rectangle(source=choice(list(App.get_running_app().decoys)),
-                                    pos=self.center, size_hint=(0.5, 0.5))
+                self.bg = Rectangle(source=choice(list(app.decoys)),
+                                    pos=self.center, size=size)
     
     def on_press(self):
+        app = App.get_running_app()
         if self.parent.index < 0:
             self.parent.parent.new_game()
         else:
-            if App.get_running_app().key_petal == self.parent.index:
+            if app.key_petal == self.parent.index:
                 choice(SOUNDS).play()
-                self.parent.parent.new_game()
+                app.new_game()
 
 
 if __name__ == "__main__":

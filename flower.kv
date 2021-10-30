@@ -32,3 +32,14 @@
         Ellipse:
             pos: root.pos
             size: root.size[0] * 1.4, root.size[1] * 1.4
+
+<Timer>:
+    pos_hint: {'x': .97}
+    size_hint: (1, 1)
+    background_color: 0, 0, 0, 0
+    canvas:
+        Color:
+            rgb: (0, 1, 0)
+        Rectangle:
+            pos: self.pos
+            size: (self.size[0]*.05, self.size[1])

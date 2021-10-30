@@ -1,10 +1,13 @@
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
-from kivy.graphics import Rectangle
+from kivy.graphics import Color, Rectangle
+from kivy.properties import NumericProperty
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.widget import Widget
 
 from glob import glob
 from math import sin, cos, pi
@@ -23,6 +26,8 @@ class Flower(App):
         self.pictures_rel_size = 0.5
         self.step = 1
         self.level = 1
+        self.max_time = 10
+        self.current_time = self.max_time
     
     def new_game(self):
         if self.step == 20:
@@ -35,6 +40,8 @@ class Flower(App):
             if self.level == 5:
                 self.stop()
                 return
+        self.root.current_screen.clock_event.cancel()
+        self.root.current_screen.clock_event = Clock.schedule_interval(self.root.current_screen.update_clock, 1)
         self.root.current_screen.root.new_game()
         self.step += 1
         if not self.step % 5:
@@ -61,18 +68,46 @@ class SettingsScreen(Screen):
 class FlowerScreen(Screen):
     def __init__(self, **kwargs):
         super(FlowerScreen, self).__init__(**kwargs)
-        root = RootLayout(size=Window.size, pos=(-0.2*Window.size[0], -0.2*Window.size[1]))
+        self.clock_event = None
+        self.root = RootLayout(size=Window.size, pos=(-0.2*Window.size[0], -0.2*Window.size[1]))
         quantity = 6
         for i in range(quantity):
-            x = root.center[0] + root.size[0]*cos(2*pi*i/quantity) * 0.3
-            y = root.center[1] + root.size[1]*sin(2*pi*i/quantity) * 0.3
-            root.add_widget(Petal(index=i, size_hint=(.25, .25), pos=(x, y)))
-        root.add_widget(Petal(size_hint=(.25, .25), pos=root.center))
-        self.add_widget(root)
-        self.root = root
+            x = self.root.center[0] + self.root.size[0]*cos(2*pi*i/quantity) * 0.3
+            y = self.root.center[1] + self.root.size[1]*sin(2*pi*i/quantity) * 0.3
+            self.root.add_widget(Petal(index=i, size_hint=(.25, .25), pos=(x, y)))
+        self.root.add_widget(Petal(size_hint=(.25, .25), pos=self.root.center))
+        self.add_widget(self.root)
+
+        self.timer = Timer()
+        self.add_widget(self.timer)
         
     def on_enter(self):
         self.root.new_game()
+        self.clock_event = Clock.schedule_interval(self.update_clock, 1)
+    
+    def update_clock(self, dt):
+        app = App.get_running_app()
+        app.current_time -= 1
+        self.timer.value = app.current_time / app.max_time
+        if app.current_time <= 0:
+            self.root.new_game()
+
+
+class Timer(Widget):
+    value = NumericProperty(1.0)
+    
+    def __init__(self, **kwargs):
+        super(Timer, self).__init__(**kwargs)
+        # self.bind(self.value=on_value)
+        
+    def on_value(self, instance, value):
+        self.canvas.clear()
+        with self.canvas:
+            if value > .3:
+                Color(0, 1, 0)
+            else:
+                Color(1, 1, 1)
+            Rectangle(pos=self.pos, size=(self.size[0]*value, self.size[1]*value))
 
 
 class RootLayout(FloatLayout):
@@ -87,6 +122,8 @@ class RootLayout(FloatLayout):
         
     def new_game(self):
         app = App.get_running_app()
+        app.current_time = app.max_time
+        self.parent.timer.value = 1.0
         app.key = randint(0, len(ANIMALS)-1)
         app.key_petal = randint(0, len(self.children)-2)
         app.decoys = set(ANIMALS).difference([ANIMALS[app.key]])

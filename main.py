@@ -9,6 +9,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
 
+import json
 from glob import glob
 from math import sin, cos, pi
 from random import choice, randint, shuffle
@@ -18,6 +19,8 @@ SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if '.ogg' in s
 
 
 class Flower(App):
+    use_kivy_settings = False
+    
     def __init__(self, **kwargs):
         super(Flower, self).__init__(**kwargs)
         self.key = None
@@ -25,17 +28,18 @@ class Flower(App):
         self.decoys = set()
         self.pictures_rel_size = 0.5
         self.step = 1
+        self.start_level = 1
         self.level = 1
         self.max_time = 10
         self.current_time = self.max_time
-    
+
     def new_game(self):
-        if self.step == 20:
+        if self.step == 25:
             self.step = 0
             self.pictures_rel_size = 0.5
             self.level += 1
             if self.level == 4:
-                self.step = 10
+                self.step = 15
                 self.pictures_rel_size = 0.25
             if self.level == 5:
                 self.stop()
@@ -46,8 +50,31 @@ class Flower(App):
         self.step += 1
         if not self.step % 5:
             self.pictures_rel_size *= 0.8
+
+    def build_config(self, config):
+        config.setdefaults('main', {
+            'timer': '10',
+            'start_level': '1'
+        })
+
+    def build_settings(self, settings):
+        with open("flower.json") as f:
+            json_data = json.load(f)
+        data = json.dumps(json_data)
+        
+        settings.add_json_panel('Flower settings', self.config, data=data)
+
+    def on_config_change(self, config, section, key, value):
+        if config is self.config:
+            if key == 'start_level':
+                self.start_level = self.config.getint('main', 'start_level')
+            if key == 'timer':
+                self.max_time = self.config.getint('main', 'timer')
     
     def build(self):
+        self.max_time = self.config.getint('main', 'timer')
+        self.start_level = self.config.getint('main', 'start_level')
+        
         sm = ScreenManager()
         
         sm.add_widget(MenuScreen(name='menu'))
@@ -58,10 +85,6 @@ class Flower(App):
 
 
 class MenuScreen(Screen):
-    pass
-
-
-class SettingsScreen(Screen):
     pass
 
 
@@ -82,6 +105,8 @@ class FlowerScreen(Screen):
         self.add_widget(self.timer)
         
     def on_enter(self):
+        app = App.get_running_app()
+        app.level = app.start_level
         self.root.new_game()
         self.clock_event = Clock.schedule_interval(self.update_clock, 1)
     
@@ -96,17 +121,13 @@ class FlowerScreen(Screen):
 class Timer(Widget):
     value = NumericProperty(1.0)
     
-    def __init__(self, **kwargs):
-        super(Timer, self).__init__(**kwargs)
-        # self.bind(self.value=on_value)
-        
     def on_value(self, instance, value):
         self.canvas.clear()
         with self.canvas:
             if value > .3:
                 Color(0, 1, 0)
             else:
-                Color(1, 1, 1)
+                Color(1, 1, 0)
             Rectangle(pos=self.pos, size=(self.size[0]*value, self.size[1]*value))
 
 

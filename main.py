@@ -4,6 +4,7 @@ from kivy.core.window import Window
 from kivy.graphics import Rectangle
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.screenmanager import ScreenManager, Screen
 
 from glob import glob
 from math import sin, cos, pi
@@ -34,12 +35,32 @@ class Flower(App):
             if self.level == 5:
                 self.stop()
                 return
-        self.root.new_game()
+        self.root.current_screen.root.new_game()
         self.step += 1
         if not self.step % 5:
             self.pictures_rel_size *= 0.8
     
     def build(self):
+        sm = ScreenManager()
+        
+        sm.add_widget(MenuScreen(name='menu'))
+        sm.add_widget(SettingsScreen(name='settings'))
+        sm.add_widget(FlowerScreen(name='flower'))
+
+        return sm
+
+
+class MenuScreen(Screen):
+    pass
+
+
+class SettingsScreen(Screen):
+    pass
+
+
+class FlowerScreen(Screen):
+    def __init__(self, **kwargs):
+        super(FlowerScreen, self).__init__(**kwargs)
         root = RootLayout(size=Window.size, pos=(-0.2*Window.size[0], -0.2*Window.size[1]))
         quantity = 6
         for i in range(quantity):
@@ -47,7 +68,11 @@ class Flower(App):
             y = root.center[1] + root.size[1]*sin(2*pi*i/quantity) * 0.3
             root.add_widget(Petal(index=i, size_hint=(.25, .25), pos=(x, y)))
         root.add_widget(Petal(size_hint=(.25, .25), pos=root.center))
-        return root
+        self.add_widget(root)
+        self.root = root
+        
+    def on_enter(self):
+        self.root.new_game()
 
 
 class RootLayout(FloatLayout):

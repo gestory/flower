@@ -1,5 +1,28 @@
 #:import random random
 
+<MenuScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            text: 'Start'
+            on_press:
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'flower'
+        Button:
+            text: 'Settings'
+            on_press:
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'settings'
+
+<SettingsScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            text: 'Back to menu'
+            on_press:
+                root.manager.transition.direction = 'right'
+                root.manager.current = 'menu'
+
 <PetalButton>:
     background_normal: ''
     background_color: 0, 0, 0, 0

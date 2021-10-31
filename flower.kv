@@ -13,6 +13,23 @@
             on_press:
                 app.open_settings()
 
+<ResultsScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Results'
+            size_hint: (1, .1)
+        GridLayout:
+            id: results
+            cols: 5
+            rows: 7
+        Button:
+            text: "Back to menu"
+            size_hint: (1, .1)
+            on_press:
+                root.manager.transition.direction = 'right'
+                root.manager.current = 'menu'
+
 <PetalButton>:
     background_normal: ''
     background_color: 0, 0, 0, 0

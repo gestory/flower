@@ -13,6 +13,10 @@ import json
 from glob import glob
 from math import sin, cos, pi
 from random import choice, randint, shuffle
+from time import time
+
+from statistics import Statistics
+
 
 ANIMALS = [animal for animal in glob('./images/*') if '.png' in animal]
 SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if '.ogg' in sound]
@@ -32,6 +36,12 @@ class Flower(App):
         self.level = 1
         self.max_time = 10
         self.current_time = self.max_time
+        
+        self.statistics = Statistics(0)
+        self.start_time = time()
+
+    def update_statistics(self, data):
+        self.statistics.update(self.level, data)
 
     def new_game(self):
         if self.step == 25:
@@ -42,7 +52,8 @@ class Flower(App):
                 self.step = 15
                 self.pictures_rel_size = 0.25
             if self.level == 5:
-                self.stop()
+                self.root.current = 'results'
+                self.root.current_screen.update_results(self.statistics.get_results())
                 return
         self.root.current_screen.clock_event.cancel()
         self.root.current_screen.clock_event = Clock.schedule_interval(self.root.current_screen.update_clock, 1)
@@ -78,14 +89,23 @@ class Flower(App):
         sm = ScreenManager()
         
         sm.add_widget(MenuScreen(name='menu'))
-        sm.add_widget(SettingsScreen(name='settings'))
         sm.add_widget(FlowerScreen(name='flower'))
+        sm.add_widget(ResultsScreen(name='results'))
 
         return sm
 
 
 class MenuScreen(Screen):
     pass
+
+
+class ResultsScreen(Screen):
+    def update_results(self, results):
+        grid = self.ids.results
+        grid.clear_widgets()
+        for row in results:
+            for e in row:
+                grid.add_widget(Button(text=e))
 
 
 class FlowerScreen(Screen):
@@ -148,6 +168,7 @@ class RootLayout(FloatLayout):
         app.key = randint(0, len(ANIMALS)-1)
         app.key_petal = randint(0, len(self.children)-2)
         app.decoys = set(ANIMALS).difference([ANIMALS[app.key]])
+        app.start_time = time()
         for children in self.children:
             children.new_game()
 
@@ -231,12 +252,12 @@ class PetalButton(Button):
     
     def on_press(self):
         app = App.get_running_app()
-        if self.parent.index < 0:
-            self.parent.parent.new_game()
+        if app.key_petal == self.parent.index:
+            app.update_statistics(time() - app.start_time)
+            choice(SOUNDS).play()
         else:
-            if app.key_petal == self.parent.index:
-                choice(SOUNDS).play()
-                app.new_game()
+            app.update_statistics(app.max_time)
+        app.new_game()
 
 
 if __name__ == "__main__":

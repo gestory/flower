@@ -3,6 +3,8 @@
 <MenuScreen>:
     BoxLayout:
         orientation: 'vertical'
+        padding: 128
+        spacing: 64
         Button:
             text: 'Start'
             on_press:
@@ -12,6 +14,10 @@
             text: 'Settings'
             on_press:
                 app.open_settings()
+        Button:
+            text: 'Exit'
+            on_press:
+                app.stop()
 
 <ResultsScreen>:
     BoxLayout:
@@ -42,7 +48,6 @@
 
 <Timer>:
     pos_hint: {'x': .97}
-    size_hint: (1, 1)
     background_color: 0, 0, 0, 0
     canvas:
         Color:
@@ -50,3 +55,6 @@
         Rectangle:
             pos: self.pos
             size: (self.size[0]*.05, self.size[1])
+
+<Score>:
+    pos_hint: {'top': 1.4, 'right': 1.4}

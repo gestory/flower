@@ -6,6 +6,7 @@ from kivy.graphics import Color, Rectangle
 from kivy.properties import NumericProperty
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
 
@@ -24,6 +25,7 @@ SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if '.ogg' in s
 
 class Flower(App):
     use_kivy_settings = False
+    score = NumericProperty(0)
     
     def __init__(self, **kwargs):
         super(Flower, self).__init__(**kwargs)
@@ -49,7 +51,6 @@ class Flower(App):
             self.pictures_rel_size = 0.5
             self.level += 1
             if self.level == 4:
-                self.step = 15
                 self.pictures_rel_size = 0.25
             if self.level == 5:
                 self.root.current = 'results'
@@ -81,6 +82,9 @@ class Flower(App):
                 self.start_level = self.config.getint('main', 'start_level')
             if key == 'timer':
                 self.max_time = self.config.getint('main', 'timer')
+    
+    def on_score(self, instance, value):
+        self.root.current_screen.score.text = str(value)
     
     def build(self):
         self.max_time = self.config.getint('main', 'timer')
@@ -124,9 +128,13 @@ class FlowerScreen(Screen):
         self.timer = Timer()
         self.add_widget(self.timer)
         
+        self.score = Score(text="0")
+        self.add_widget(self.score)
+        
     def on_enter(self):
         app = App.get_running_app()
         app.level = app.start_level
+        app.score = 0
         self.root.new_game()
         self.clock_event = Clock.schedule_interval(self.update_clock, 1)
     
@@ -149,6 +157,10 @@ class Timer(Widget):
             else:
                 Color(1, 1, 0)
             Rectangle(pos=self.pos, size=(self.size[0]*value, self.size[1]*value))
+
+
+class Score(Label):
+    pass
 
 
 class RootLayout(FloatLayout):
@@ -253,7 +265,9 @@ class PetalButton(Button):
     def on_press(self):
         app = App.get_running_app()
         if app.key_petal == self.parent.index:
-            app.update_statistics(time() - app.start_time)
+            exercise_time = time() - app.start_time
+            app.update_statistics(exercise_time)
+            app.score += (app.max_time - int(exercise_time)) * 2
             choice(SOUNDS).play()
         else:
             app.update_statistics(app.max_time)
@@ -261,4 +275,6 @@ class PetalButton(Button):
 
 
 if __name__ == "__main__":
+    Window.size = (1024, 768)
+    Window.fullscreen = True
     Flower().run()

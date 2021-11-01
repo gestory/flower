@@ -50,9 +50,8 @@ class Flower(App):
             self.step = 0
             self.pictures_rel_size = 0.5
             self.level += 1
-            if self.level == 4:
-                self.pictures_rel_size = 0.25
             if self.level == 5:
+                self.level = self.start_level
                 self.root.current = 'results'
                 self.root.current_screen.update_results(self.statistics.get_results())
                 return
@@ -82,6 +81,7 @@ class Flower(App):
         if config is self.config:
             if key == 'start_level':
                 self.start_level = self.config.getint('main', 'start_level')
+                self.level = self.start_level
             if key == 'timer':
                 self.max_time = self.config.getint('main', 'timer')
     
@@ -123,13 +123,13 @@ class FlowerScreen(Screen):
     def __init__(self, **kwargs):
         super(FlowerScreen, self).__init__(**kwargs)
         self.clock_event = None
-        self.root = RootLayout(size=Window.size, pos=(-0.2*Window.size[0], -0.2*Window.size[1]))
+        self.root = RootLayout(size=(640, 640), pos=(64, -64))
+        self.root.add_widget(Petal(size_hint=(.16, .24), pos=self.root.center))
         quantity = 6
         for i in range(quantity):
-            x = self.root.center[0] + self.root.size[0]*cos(2*pi*i/quantity) * 0.3
-            y = self.root.center[1] + self.root.size[1]*sin(2*pi*i/quantity) * 0.3
-            self.root.add_widget(Petal(index=i, size_hint=(.25, .25), pos=(x, y)))
-        self.root.add_widget(Petal(size_hint=(.25, .25), pos=self.root.center))
+            x = self.root.center[0] + self.root.width*cos(2*pi*i/quantity) * 0.4
+            y = self.root.center[1] + self.root.height*sin(2*pi*i/quantity) * 0.4
+            self.root.add_widget(Petal(index=i, size_hint=(.16, .24), pos=(x, y)))
         self.add_widget(self.root)
 
         self.timer = Timer()
@@ -174,15 +174,6 @@ class Score(Label):
 
 
 class RootLayout(FloatLayout):
-    def __init__(self, **kwargs):
-        super(RootLayout, self).__init__(**kwargs)
-        self.bind(pos=self.update)
-        self.bind(size=self.update)
-        
-    def update(self, *args):
-        self.pos = (-0.2*Window.size[0], -0.2*Window.size[1])
-        self.size = Window.size
-        
     def new_game(self):
         app = App.get_running_app()
         app.current_time = app.max_time
@@ -204,19 +195,6 @@ class Petal(FloatLayout):
         self.pos = self.button.pos
         self.add_widget(self.button)
 
-        self.bind(pos=self.update)
-        self.bind(size=self.update)
-
-    def update(self, *args):
-        if self.index >= 0:
-            x = self.parent.center[0] + Window.size[0] * cos(2 * pi * self.index / 6) * .3
-            y = self.parent.center[1] + Window.size[1] * sin(2 * pi * self.index / 6) * .3
-        else:
-            x = self.parent.center[0]
-            y = self.parent.center[1]
-        self.button.pos = x, y
-        self.button.size = self.size
-     
     def new_game(self):
         self.button.new_game()
     
@@ -237,23 +215,27 @@ class PetalButton(Button):
             pictures = self.get_pictures(list(app.decoys), quantity)
         shuffle(pictures)
         with self.canvas:
-            self.bg = Rectangle(source=pictures.pop(), pos=self.center, size=size)
+            self.bg = Rectangle(source=pictures.pop(), pos=(32-size[0]/2 + self.center[0],
+                                                            32-size[1]/2 + self.center[1]), size=size)
             for i in range(quantity-1):
-                pos = (self.center[0] + self.size[0] * cos(2 * pi * i / (quantity-1)) * radius,
-                       self.center[1] + self.size[1] * sin(2 * pi * i / (quantity-1)) * radius)
+                pos = (32 - size[0]/2 + self.center[0] + self.size[0] * cos(2 * pi * i / (quantity-1)) * radius,
+                       32 - size[1]/2 + self.center[1] + self.size[1] * sin(2 * pi * i / (quantity-1)) * radius)
                 self.bg = Rectangle(source=pictures.pop(), pos=pos, size=size)
 
     def draw_one_picture(self, app, size):
         self.draw_several_pictures(app, size, 1, None)
     
     def draw_four_pictures(self, app, size):
-        self.draw_several_pictures(app, size, 4, .3)
+        size = [d * .9 for d in size]
+        self.draw_several_pictures(app, size, 4, .4)
         
     def draw_seven_pictures(self, app, size):
-        self.draw_several_pictures(app, size, 7, .33)
+        size = [d * .8 for d in size]
+        self.draw_several_pictures(app, size, 7, .4)
         
     def draw_ten_pictures(self, app, size):
-        self.draw_several_pictures(app, size, 10, .35)
+        size = [d * .7 for d in size]
+        self.draw_several_pictures(app, size, 10, .4)
     
     def new_game(self):
         app = App.get_running_app()
@@ -261,7 +243,8 @@ class PetalButton(Button):
         self.canvas.clear()
         if self.parent.index == -1:
             with self.canvas:
-                self.bg = Rectangle(source=ANIMALS[app.key], pos=self.center, size=size)
+                self.bg = Rectangle(source=ANIMALS[app.key], pos=(32-size[0]/2 + self.center[0],
+                                                                  32-size[1]/2 + self.center[1]), size=size)
         else:
             if app.level == 1:
                 self.draw_one_picture(app, size)
@@ -285,6 +268,7 @@ class PetalButton(Button):
 
 
 if __name__ == "__main__":
+    Window.clearcolor = (.4, .4, .3, 1)
     Window.size = (1024, 768)
     Window.fullscreen = True
     Flower().run()

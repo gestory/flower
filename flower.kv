@@ -3,8 +3,11 @@
 <MenuScreen>:
     BoxLayout:
         orientation: 'vertical'
+        size_hint: (.5, 1)
         padding: 128
         spacing: 64
+        Label:
+            text: 'The Flower'
         Button:
             text: 'Start'
             on_press:
@@ -14,6 +17,8 @@
             text: 'Settings'
             on_press:
                 app.open_settings()
+        Button:
+            text: 'About'
         Button:
             text: 'Exit'
             on_press:

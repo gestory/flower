@@ -19,6 +19,20 @@
             on_press:
                 app.stop()
 
+<CongratsScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: "Congratulation!"
+        Label:
+            text:
+                str(app.score)
+        Button:
+            text: "Next level"
+            on_press:
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'flower'
+
 <ResultsScreen>:
     BoxLayout:
         orientation: 'vertical'

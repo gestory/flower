@@ -56,6 +56,8 @@ class Flower(App):
                 self.root.current = 'results'
                 self.root.current_screen.update_results(self.statistics.get_results())
                 return
+            self.root.current = 'congrats'
+            return
         self.root.current_screen.clock_event.cancel()
         self.root.current_screen.clock_event = Clock.schedule_interval(self.root.current_screen.update_clock, 1)
         self.root.current_screen.root.new_game()
@@ -94,12 +96,17 @@ class Flower(App):
         
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(FlowerScreen(name='flower'))
+        sm.add_widget(CongratsScreen(name='congrats'))
         sm.add_widget(ResultsScreen(name='results'))
 
         return sm
 
 
 class MenuScreen(Screen):
+    pass
+
+
+class CongratsScreen(Screen):
     pass
 
 
@@ -133,6 +140,9 @@ class FlowerScreen(Screen):
         
     def on_enter(self):
         app = App.get_running_app()
+        if app.level > app.start_level:
+            self.root.new_game()
+            return
         app.level = app.start_level
         app.score = 0
         self.root.new_game()

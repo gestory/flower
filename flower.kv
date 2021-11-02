@@ -18,7 +18,7 @@
         orientation: 'vertical'
         size_hint: (.5, 1)
         padding: 128
-        spacing: 64
+        spacing: 48
         Label:
             text: 'The Flower'
         TextInput:
@@ -32,6 +32,11 @@
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'flower'
         Button:
+            text: "Hall of Fame"
+            on_press:
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'hall_of_fame'
+        Button:
             text: 'Settings'
             on_press:
                 app.open_settings()
@@ -41,6 +46,25 @@
             text: 'Exit'
             on_press:
                 app.stop()
+
+<HallOfFameScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Button:
+            text: "Hall of Fame"
+            size_hint: (1, .1)
+        GridLayout:
+            id: hall_of_fame
+            row_default_height: 64
+            cols_minimum: {0:64, 1:256, 2:256}
+            cols: 3
+            rows: 10
+        Button:
+            text: "Back to menu"
+            size_hint: (1, .1)
+            on_press:
+                root.manager.transition.direction = 'right'
+                root.manager.current = 'menu'
 
 <CongratsScreen>:
     BoxLayout:

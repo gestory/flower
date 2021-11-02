@@ -10,6 +10,7 @@ from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
 
+import csv
 import json
 from glob import glob
 from math import sin, cos, pi
@@ -44,9 +45,30 @@ class Flower(App):
         self.max_time = self.max_times[self.level]
         self.current_time = self.max_time
         self.errors = 0
+        self.results = []
+        self.load_top_results()
         
         self.statistics = Statistics(0)
         self.start_time = time()
+
+    @property
+    def top_results(self):
+        return [[i+1, *result] for i, result in
+                enumerate(sorted(self.results, key=lambda e: e[1], reverse=True)[:10])]
+
+    def load_top_results(self):
+        try:
+            with open('top_scores', 'r') as top_scores:
+                for name, score in csv.reader(top_scores):
+                    self.results.append([name, int(score)])
+        except FileNotFoundError:
+            pass
+        if not self.results:
+            self.results = [['root', 100], ['admin', 10], ['Cheburashka', 1000]]
+
+    def save_top_results(self):
+        with open('top_scores', 'w') as top_scores:
+            csv.writer(top_scores).writerows(self.results)
 
     def error(self):
         self.errors += 1
@@ -70,6 +92,8 @@ class Flower(App):
             self.pictures_rel_size = 0.5
             self.level += 1
             if self.level == 5:
+                self.results.append([self.username, self.score])
+                self.save_top_results()
                 self.level = self.start_level
                 self.root.current = 'results'
                 self.root.current_screen.update_results(*self.statistics.get_results())
@@ -112,6 +136,7 @@ class Flower(App):
         sm = ScreenManager()
         
         sm.add_widget(MenuScreen(name='menu'))
+        sm.add_widget(HallOfFameScreen(name='hall_of_fame'))
         sm.add_widget(FlowerScreen(name='flower'))
         sm.add_widget(CongratsScreen(name='congrats'))
         sm.add_widget(ResultsScreen(name='results'))
@@ -121,6 +146,17 @@ class Flower(App):
 
 class MenuScreen(Screen):
     pass
+
+
+class HallOfFameScreen(Screen):
+    def on_enter(self):
+        grid = self.ids.hall_of_fame
+        grid.clear_widgets()
+        
+        app = App.get_running_app()
+        for result in app.top_results:
+            for e in result:
+                grid.add_widget(Button(text=str(e)))
 
 
 class CongratsScreen(Screen):

@@ -71,7 +71,7 @@ class Flower(App):
             if self.level == 5:
                 self.level = self.start_level
                 self.root.current = 'results'
-                self.root.current_screen.update_results(self.statistics.get_results())
+                self.root.current_screen.update_results(*self.statistics.get_results())
                 return
             self.root.current = 'congrats'
             return
@@ -127,12 +127,18 @@ class CongratsScreen(Screen):
 
 
 class ResultsScreen(Screen):
-    def update_results(self, results):
+    def update_results(self, results, k):
         grid = self.ids.results
         grid.clear_widgets()
         for row in results:
             for e in row:
                 grid.add_widget(Button(text=e))
+        k1 = self.ids.k1
+        k1.text = "K1: " + k[0]
+        k2 = self.ids.k2
+        k2.text = "K2: " + k[1]
+        k3 = self.ids.k3
+        k3.text = "K3: " + k[2]
 
 
 class FlowerScreen(Screen):

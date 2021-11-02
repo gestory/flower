@@ -48,6 +48,21 @@
             id: results
             cols: 5
             rows: 7
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: (1, .1)
+            Label:
+                text: "Final score: " + str(app.score)
+                size_hint: (.5, 1)
+            Label:
+                id: k1
+                text: ''
+            Label:
+                id: k2
+                text: ''
+            Label:
+                id: k3
+                text: ''
         Button:
             text: "Back to menu"
             size_hint: (1, .1)

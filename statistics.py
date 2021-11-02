@@ -25,17 +25,25 @@ class Statistics(object):
         except KeyError:
             self.statistics[level] = {size: (mean_time, errors)}
     
-    def mean(self, level):
+    def __mean(self, level):
         try:
             data = [e[0] for e in self.statistics[level].values() if e[0]]
             if data:
-                return str(round(sum(data) / len(data), 2))
+                return round(sum(data) / len(data), 2)
+        except KeyError:
+            return None
+    
+    def mean(self, level) -> str:
+        try:
+            mean = self.__mean(level)
+            if mean:
+                return str(mean)
             else:
                 return 'N/A'
         except KeyError:
             return 'N/A'
         
-    def get_data(self, level, size):
+    def get_data(self, level, size) -> str:
         level_data = self.statistics.get(level, None)
         if not level_data:
             return 'N/A'
@@ -60,7 +68,34 @@ class Statistics(object):
                          ("4", self.get_data(1, 4), self.get_data(2, 4), self.get_data(3, 4), self.get_data(4, 4)),
                          ("5", self.get_data(1, 5), self.get_data(2, 5), self.get_data(3, 5), self.get_data(4, 5)),
                          ("Mean:", self.mean(1), self.mean(2), self.mean(3), self.mean(4)))
-        return results_table
+        return results_table, [self.k1, self.k2, self.k3]
 
     def clear_results(self):
         self.statistics = {}
+    
+    @property
+    def k1(self):
+        mean_1 = self.__mean(1)
+        mean_2 = self.__mean(2)
+        if mean_1 and mean_2:
+            return str(round(mean_2 / mean_1, 2))
+        else:
+            return 'N/A'
+
+    @property
+    def k2(self):
+        mean_1 = self.__mean(1)
+        mean_3 = self.__mean(3)
+        if mean_1 and mean_3:
+            return str(round(mean_3 / mean_1, 2))
+        else:
+            return 'N/A'
+
+    @property
+    def k3(self):
+        mean_1 = self.__mean(1)
+        mean_4 = self.__mean(4)
+        if mean_1 and mean_4:
+            return str(round(mean_4 / mean_1, 2))
+        else:
+            return 'N/A'

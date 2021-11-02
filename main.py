@@ -3,7 +3,7 @@ from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, StringProperty
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
@@ -27,6 +27,7 @@ WRONG_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'wron
 class Flower(App):
     use_kivy_settings = False
     score = NumericProperty(0)
+    username = StringProperty('')
     
     def __init__(self, **kwargs):
         super(Flower, self).__init__(**kwargs)

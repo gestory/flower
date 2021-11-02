@@ -1,4 +1,17 @@
 #:import random random
+#:import os os
+
+<BackgroundColor@Widget>
+    background_color: 1, 1, 1, 1
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+<BackgroundLabel@Label+BackgroundColor>
+    background_color: .4, .4, .3, 1
 
 <MenuScreen>:
     BoxLayout:
@@ -8,9 +21,14 @@
         spacing: 64
         Label:
             text: 'The Flower'
+        TextInput:
+            id: username
+            text: os.getenv('USER', 'username')
+            multiline: False
         Button:
             text: 'Start'
             on_press:
+                app.username = username.text
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'flower'
         Button:
@@ -28,7 +46,7 @@
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: "Congratulation!"
+            text: "Congratulation, {}!".format(app.username)
         Label:
             text:
                 'Your current score is ' + str(app.score)
@@ -41,34 +59,45 @@
 <ResultsScreen>:
     BoxLayout:
         orientation: 'vertical'
-        Label:
-            text: 'Results'
-            size_hint: (1, .1)
-        GridLayout:
-            id: results
-            cols: 5
-            rows: 7
+        BoxLayout:
+            orientation: 'vertical'
+            id: main
+            BackgroundLabel:
+                text: 'Results of ' + app.username
+                size_hint: (1, .1)
+            GridLayout:
+                id: results
+                cols: 5
+                rows: 7
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint: (1, .1)
+                BackgroundLabel:
+                    text: "Final score: " + str(app.score)
+                    size_hint: (.5, 1)
+                BackgroundLabel:
+                    id: k1
+                    text: ''
+                BackgroundLabel:
+                    id: k2
+                    text: ''
+                BackgroundLabel:
+                    id: k3
+                    text: ''
         BoxLayout:
             orientation: 'horizontal'
             size_hint: (1, .1)
-            Label:
-                text: "Final score: " + str(app.score)
-                size_hint: (.5, 1)
-            Label:
-                id: k1
-                text: ''
-            Label:
-                id: k2
-                text: ''
-            Label:
-                id: k3
-                text: ''
-        Button:
-            text: "Back to menu"
-            size_hint: (1, .1)
-            on_press:
-                root.manager.transition.direction = 'right'
-                root.manager.current = 'menu'
+            Button:
+                text: "Save results and return to menu"
+                on_press:
+                    main.export_to_png(os.path.join("results", app.username + "_results.png"))
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'menu'
+            Button:
+                text: "Back to menu"
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'menu'
 
 <PetalButton>:
     background_normal: ''

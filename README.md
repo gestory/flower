@@ -19,6 +19,5 @@ Run the app
 `python main.py`
 
 ## Thanks for media files
-Animal images: https://www.elharrakfonts.com/2019/01/icon-animals.html
 
-Sounds: http://gcompris.net/
+All sounds: http://gcompris.net/

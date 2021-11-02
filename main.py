@@ -20,7 +20,8 @@ from statistics import Statistics
 
 
 ANIMALS = [animal for animal in glob('./images/*') if '.png' in animal]
-SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if '.ogg' in sound]
+CORRECT_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'correct' in sound]
+WRONG_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'wrong' in sound]
 
 
 class Flower(App):
@@ -34,20 +35,35 @@ class Flower(App):
         self.decoys = set()
         self.pictures_rel_size = 0.5
         self.step = 1
+        self.size = 1
+        self.timings = []
         self.start_level = 1
         self.level = 1
         self.max_time = 10
         self.current_time = self.max_time
+        self.errors = 0
         
         self.statistics = Statistics(0)
         self.start_time = time()
 
+    def error(self):
+        self.errors += 1
+        choice(WRONG_SOUNDS).play()
+
     def update_statistics(self, data):
-        self.statistics.update(self.level, data)
+        self.timings.append(data)
 
     def new_game(self):
-        if self.step == 25:
-            self.step = 0
+        self.root.current_screen.clock_event.cancel()
+        if not self.step % 5:
+            self.statistics.update(self.level, self.size, self.timings, self.errors)
+            self.timings = []
+            self.errors = 0
+            self.size += 1
+            self.pictures_rel_size *= 0.8
+        if self.size == 6:
+            self.step = 1
+            self.size = 1
             self.pictures_rel_size = 0.5
             self.level += 1
             if self.level == 5:
@@ -57,12 +73,9 @@ class Flower(App):
                 return
             self.root.current = 'congrats'
             return
-        self.root.current_screen.clock_event.cancel()
         self.root.current_screen.clock_event = Clock.schedule_interval(self.root.current_screen.update_clock, 1)
         self.root.current_screen.root.new_game()
         self.step += 1
-        if not self.step % 5:
-            self.pictures_rel_size *= 0.8
 
     def build_config(self, config):
         config.setdefaults('main', {
@@ -153,6 +166,7 @@ class FlowerScreen(Screen):
         app.current_time -= 1
         self.timer.value = app.current_time / app.max_time
         if app.current_time <= 0:
+            app.error()
             self.root.new_game()
 
 
@@ -261,9 +275,9 @@ class PetalButton(Button):
             exercise_time = time() - app.start_time
             app.update_statistics(exercise_time)
             app.score += (app.max_time - int(exercise_time)) * 2
-            choice(SOUNDS).play()
+            choice(CORRECT_SOUNDS).play()
         else:
-            app.update_statistics(app.max_time)
+            app.error()
         app.new_game()
 
 

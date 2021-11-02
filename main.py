@@ -34,12 +34,13 @@ class Flower(App):
         self.key_petal = None
         self.decoys = set()
         self.pictures_rel_size = 0.5
-        self.step = 1
+        self.step = 0
         self.size = 1
         self.timings = []
         self.start_level = 1
         self.level = 1
-        self.max_time = 10
+        self.max_times = [0, 5, 10, 15, 20]
+        self.max_time = self.max_times[self.level]
         self.current_time = self.max_time
         self.errors = 0
         
@@ -55,14 +56,15 @@ class Flower(App):
 
     def new_game(self):
         self.root.current_screen.clock_event.cancel()
-        if not self.step % 5:
+        self.max_time = self.max_times[self.level]
+        if self.step and not self.step % 5:
             self.statistics.update(self.level, self.size, self.timings, self.errors)
             self.timings = []
             self.errors = 0
             self.size += 1
             self.pictures_rel_size *= 0.8
         if self.size == 6:
-            self.step = 1
+            self.step = 0
             self.size = 1
             self.pictures_rel_size = 0.5
             self.level += 1
@@ -79,8 +81,9 @@ class Flower(App):
 
     def build_config(self, config):
         config.setdefaults('main', {
-            'timer': '10',
-            'start_level': '1'
+            'start_level': '1'})
+        config.setdefaults('timer', {
+            '1': 5, '2': 10, '3': 15, '4': 20
         })
 
     def build_settings(self, settings):
@@ -95,15 +98,15 @@ class Flower(App):
             if key == 'start_level':
                 self.start_level = self.config.getint('main', 'start_level')
                 self.level = self.start_level
-            if key == 'timer':
-                self.max_time = self.config.getint('main', 'timer')
-    
+            if section == 'timer':
+                self.max_times[int(key)] = self.config.getint('timer', key)
+                
     def on_score(self, instance, value):
         self.root.current_screen.score.text = str(value)
     
     def build(self):
-        self.max_time = self.config.getint('main', 'timer')
         self.start_level = self.config.getint('main', 'start_level')
+        self.max_time = self.config.getint('timer', str(self.start_level))
         
         sm = ScreenManager()
         
@@ -152,14 +155,14 @@ class FlowerScreen(Screen):
         self.add_widget(self.score)
         
     def on_enter(self):
+        self.clock_event = Clock.schedule_interval(self.update_clock, 1)
         app = App.get_running_app()
         if app.level > app.start_level:
-            self.root.new_game()
+            app.new_game()
             return
         app.level = app.start_level
         app.score = 0
-        self.root.new_game()
-        self.clock_event = Clock.schedule_interval(self.update_clock, 1)
+        app.new_game()
     
     def update_clock(self, dt):
         app = App.get_running_app()

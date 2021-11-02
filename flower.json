@@ -10,8 +10,23 @@
       "options": ["1", "2", "3", "4"] },
 
     { "type": "numeric",
-      "title": "Timeout",
+      "title": "Level 1 timeout",
       "desc": "Time you have to find correct figure",
-      "section": "main",
-      "key": "timer" }
+      "section": "timer",
+      "key": "1" },
+    { "type": "numeric",
+      "title": "Level 2 timeout",
+      "desc": "Time you have to find correct figure",
+      "section": "timer",
+      "key": "2" },
+    { "type": "numeric",
+      "title": "Level 3 timeout",
+      "desc": "Time you have to find correct figure",
+      "section": "timer",
+      "key": "3" },
+    { "type": "numeric",
+      "title": "Level 4 timeout",
+      "desc": "Time you have to find correct figure",
+      "section": "timer",
+      "key": "4" }
 ]

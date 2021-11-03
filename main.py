@@ -30,6 +30,7 @@ class Flower(App):
     use_kivy_settings = False
     score = NumericProperty(0)
     username = StringProperty('')
+    condition = StringProperty('')
     texture = ObjectProperty()
     
     def __init__(self, **kwargs):
@@ -142,6 +143,7 @@ class Flower(App):
         sm = ScreenManager()
         
         sm.add_widget(MenuScreen(name='menu'))
+        sm.add_widget(StartScreen(name='start'))
         sm.add_widget(HallOfFameScreen(name='hall_of_fame'))
         sm.add_widget(FlowerScreen(name='flower'))
         sm.add_widget(CongratsScreen(name='congrats'))
@@ -155,6 +157,10 @@ class BackgroundScreen(Screen):
 
 
 class MenuScreen(BackgroundScreen):
+    pass
+
+
+class StartScreen(BackgroundScreen):
     pass
 
 

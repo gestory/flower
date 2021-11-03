@@ -30,16 +30,11 @@
         spacing: 48
         Label:
             text: 'The Flower'
-        TextInput:
-            id: username
-            text: os.getenv('USER', 'username')
-            multiline: False
         Button:
             text: 'Start'
             on_press:
-                app.username = username.text
                 root.manager.transition.direction = 'left'
-                root.manager.current = 'flower'
+                root.manager.current = 'start'
         Button:
             text: "Hall of Fame"
             on_press:
@@ -55,6 +50,34 @@
             text: 'Exit'
             on_press:
                 app.stop()
+
+<StartScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: (.5, 1)
+        padding: 128
+        spacing: 32
+        Label:
+            text: "Please select an existed user or add a new one.\nIt is recommended to try first with a healthy eye\nto have results you can keep as a goal for a lazy eye."
+        Label:
+            text: "Enter your name:"
+        TextInput:
+            id: username
+            text: os.getenv('USER', 'Neznayka')
+            multiline: False
+        Label:
+            text: "Choose training condition:"
+        Spinner:
+            id: condition
+            text: 'Both eyes'
+            values: 'Both eyes', 'Left eye', 'Right eye'
+        Button:
+            text: 'Start'
+            on_press:
+                app.username = username.text
+                app.condition = condition.text
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'flower'
 
 <HallOfFameScreen>:
     BoxLayout:
@@ -96,7 +119,7 @@
             orientation: 'vertical'
             id: main
             BackgroundLabel:
-                text: 'Results of ' + app.username
+                text: 'Results of ' + app.username + " (" + app.condition + ")"
                 size_hint: (1, .1)
             GridLayout:
                 id: results

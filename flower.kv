@@ -13,6 +13,15 @@
 <BackgroundLabel@Label+BackgroundColor>
     background_color: .4, .4, .3, 1
 
+<BackgroundScreen@Screen>:
+    canvas.before:
+        Color:
+            rgb: 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            texture: app.texture
+
 <MenuScreen>:
     BoxLayout:
         orientation: 'vertical'

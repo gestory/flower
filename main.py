@@ -3,9 +3,10 @@ from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle
-from kivy.properties import NumericProperty, StringProperty
+from kivy.properties import NumericProperty, ObjectProperty, StringProperty
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.widget import Widget
@@ -20,7 +21,7 @@ from time import time
 from statistics import Statistics
 
 
-ANIMALS = [animal for animal in glob('./images/*') if '.png' in animal]
+ANIMALS = [animal for animal in glob('./images/shapes/*/*') if '.png' in animal]
 CORRECT_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'correct' in sound]
 WRONG_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'wrong' in sound]
 
@@ -29,6 +30,7 @@ class Flower(App):
     use_kivy_settings = False
     score = NumericProperty(0)
     username = StringProperty('')
+    texture = ObjectProperty()
     
     def __init__(self, **kwargs):
         super(Flower, self).__init__(**kwargs)
@@ -133,6 +135,10 @@ class Flower(App):
         self.start_level = self.config.getint('main', 'start_level')
         self.max_time = self.config.getint('timer', str(self.start_level))
         
+        self.texture = Image(source='images/green_tile.png').texture
+        self.texture.wrap = 'repeat'
+        self.texture.uvsize = (8, 6)
+        
         sm = ScreenManager()
         
         sm.add_widget(MenuScreen(name='menu'))
@@ -144,11 +150,15 @@ class Flower(App):
         return sm
 
 
-class MenuScreen(Screen):
+class BackgroundScreen(Screen):
     pass
 
 
-class HallOfFameScreen(Screen):
+class MenuScreen(BackgroundScreen):
+    pass
+
+
+class HallOfFameScreen(BackgroundScreen):
     def on_enter(self):
         grid = self.ids.hall_of_fame
         grid.clear_widgets()
@@ -159,11 +169,11 @@ class HallOfFameScreen(Screen):
                 grid.add_widget(Button(text=str(e)))
 
 
-class CongratsScreen(Screen):
+class CongratsScreen(BackgroundScreen):
     pass
 
 
-class ResultsScreen(Screen):
+class ResultsScreen(BackgroundScreen):
     def update_results(self, results, k):
         grid = self.ids.results
         grid.clear_widgets()
@@ -178,7 +188,7 @@ class ResultsScreen(Screen):
         k3.text = "K3: " + k[2]
 
 
-class FlowerScreen(Screen):
+class FlowerScreen(BackgroundScreen):
     def __init__(self, **kwargs):
         super(FlowerScreen, self).__init__(**kwargs)
         self.clock_event = None

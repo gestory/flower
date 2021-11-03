@@ -8,7 +8,7 @@ from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager, Screen, CardTransition
 from kivy.uix.widget import Widget
 
 import csv
@@ -140,7 +140,7 @@ class Flower(App):
         self.texture.wrap = 'repeat'
         self.texture.uvsize = (8, 6)
         
-        sm = ScreenManager()
+        sm = ScreenManager(transition=CardTransition())
         
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(StartScreen(name='start'))
@@ -344,7 +344,6 @@ class PetalButton(Button):
 
 
 if __name__ == "__main__":
-    Window.clearcolor = (.4, .4, .3, 1)
     Window.size = (1024, 768)
     Window.fullscreen = True
     Flower().run()

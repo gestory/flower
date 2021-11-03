@@ -85,7 +85,7 @@ class Flower(App):
             self.timings = []
             self.errors = 0
             self.size += 1
-            self.pictures_rel_size *= 0.8
+            self.pictures_rel_size *= 0.86
         if self.size == 6:
             self.step = 0
             self.size = 1
@@ -267,7 +267,7 @@ class PetalButton(Button):
             pictures.append(choice(decoys))
         return pictures
     
-    def draw_several_pictures(self, app, size, quantity, radius):
+    def draw_several_pictures(self, app, size, quantity, radius=1):
         if app.key_petal == self.parent.index:
             pictures = [ANIMALS[app.key]]
             pictures += self.get_pictures(list(app.decoys), quantity-1)
@@ -283,19 +283,19 @@ class PetalButton(Button):
                 self.bg = Rectangle(source=pictures.pop(), pos=pos, size=size)
 
     def draw_one_picture(self, app, size):
-        self.draw_several_pictures(app, size, 1, None)
+        self.draw_several_pictures(app, size, 1)
     
     def draw_four_pictures(self, app, size):
         size = [d * .9 for d in size]
-        self.draw_several_pictures(app, size, 4, .4)
+        self.draw_several_pictures(app, size, 4, app.pictures_rel_size)
         
     def draw_seven_pictures(self, app, size):
         size = [d * .8 for d in size]
-        self.draw_several_pictures(app, size, 7, .4)
+        self.draw_several_pictures(app, size, 7, app.pictures_rel_size)
         
     def draw_ten_pictures(self, app, size):
-        size = [d * .7 for d in size]
-        self.draw_several_pictures(app, size, 10, .4)
+        size = [d * .75 for d in size]
+        self.draw_several_pictures(app, size, 10, app.pictures_rel_size)
     
     def new_game(self):
         app = App.get_running_app()

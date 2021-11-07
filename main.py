@@ -70,7 +70,7 @@ class Flower(App):
             self.results = [['root', 100], ['admin', 10], ['Cheburashka', 1000]]
 
     def save_top_results(self):
-        with open('top_scores', 'w') as top_scores:
+        with open('top_scores', 'w', newline='') as top_scores:
             csv.writer(top_scores).writerows(self.results)
 
     def error(self):

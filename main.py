@@ -18,10 +18,10 @@ from math import sin, cos, pi
 from random import choice, randint, shuffle
 from time import time
 
+from shapes import Shapes
 from statistics import Statistics
 
 
-ANIMALS = [animal for animal in glob('./images/shapes/*/*') if '.png' in animal]
 CORRECT_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'correct' in sound]
 WRONG_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'wrong' in sound]
 
@@ -53,11 +53,21 @@ class Flower(App):
         
         self.statistics = Statistics(0)
         self.start_time = time()
+        
+        self.themes = []
+        self.shapes = Shapes().shapes
 
     @property
     def top_results(self):
         return [[i+1, *result] for i, result in
                 enumerate(sorted(self.results, key=lambda e: e[1], reverse=True)[:10])]
+
+    def _populate_shapes(self):
+        self.themes = []
+        for theme in Shapes().get_themes():
+            if self.config.getint('pictures', theme):
+                self.themes.append(theme)
+        self.shapes = Shapes(self.themes).shapes
 
     def load_top_results(self):
         try:
@@ -111,8 +121,9 @@ class Flower(App):
         config.setdefaults('main', {
             'start_level': '1'})
         config.setdefaults('timer', {
-            '1': 5, '2': 10, '3': 15, '4': 20
-        })
+            '1': 5, '2': 10, '3': 15, '4': 20})
+        config.setdefaults('pictures', {
+            'monsters': 1, 'animals': 1, 'numbers': 1, 'letters': 1})
 
     def build_settings(self, settings):
         with open("flower.json") as f:
@@ -128,9 +139,14 @@ class Flower(App):
                 self.level = self.start_level
             if section == 'timer':
                 self.max_times[int(key)] = self.config.getint('timer', key)
+            if section == 'pictures':
+                self._populate_shapes()
                 
     def on_score(self, instance, value):
         self.root.current_screen.score.text = str(value)
+
+    def on_start(self):
+        self._populate_shapes()
     
     def build(self):
         self.start_level = self.config.getint('main', 'start_level')
@@ -254,9 +270,9 @@ class RootLayout(FloatLayout):
         app = App.get_running_app()
         app.current_time = app.max_time
         self.parent.timer.value = 1.0
-        app.key = randint(0, len(ANIMALS)-1)
+        app.key = randint(0, len(app.shapes)-1)
         app.key_petal = randint(0, len(self.children)-2)
-        app.decoys = set(ANIMALS).difference([ANIMALS[app.key]])
+        app.decoys = set(app.shapes).difference([app.shapes[app.key]])
         app.start_time = time()
         for children in self.children:
             children.new_game()
@@ -285,7 +301,7 @@ class PetalButton(Button):
     
     def draw_several_pictures(self, app, size, quantity, radius=1):
         if app.key_petal == self.parent.index:
-            pictures = [ANIMALS[app.key]]
+            pictures = [app.shapes[app.key]]
             pictures += self.get_pictures(list(app.decoys), quantity-1)
         else:
             pictures = self.get_pictures(list(app.decoys), quantity)
@@ -319,7 +335,7 @@ class PetalButton(Button):
         self.canvas.clear()
         if self.parent.index == -1:
             with self.canvas:
-                self.bg = Rectangle(source=ANIMALS[app.key], pos=(32-size[0]/2 + self.center[0],
+                self.bg = Rectangle(source=app.shapes[app.key], pos=(32-size[0]/2 + self.center[0],
                                                                   32-size[1]/2 + self.center[1]), size=size)
         else:
             if app.level == 1:

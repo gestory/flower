@@ -1,7 +1,4 @@
 [
-    { "type": "title",
-      "title": "Flower settings" },
-
     { "type": "options",
       "title": "Start level",
       "desc": "You can choose from the 1st to the 4th",
@@ -28,5 +25,26 @@
       "title": "Level 4 timeout",
       "desc": "Time you have to find correct figure",
       "section": "timer",
-      "key": "4" }
+      "key": "4" },
+
+    { "type": "bool",
+      "title": "Monsters",
+      "desc": "Use monsters pictures",
+      "section": "pictures",
+      "key": "monsters" },
+    { "type": "bool",
+      "title": "Animals",
+      "desc": "Use animals pictures",
+      "section": "pictures",
+      "key": "animals" },
+    { "type": "bool",
+      "title": "Numbers",
+      "desc": "Use numbers pictures",
+      "section": "pictures",
+      "key": "numbers" },
+    { "type": "bool",
+      "title": "Letters",
+      "desc": "Use letters pictures",
+      "section": "pictures",
+      "key": "letters" }
 ]

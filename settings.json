@@ -1,10 +1,20 @@
 [
+    {
+        "type": "title",
+        "title": "Start level"
+    },
+
     { "type": "options",
       "title": "Start level",
       "desc": "You can choose from the 1st to the 4th",
       "section": "main",
       "key": "start_level",
       "options": ["1", "2", "3", "4"] },
+
+    {
+        "type": "title",
+        "title": "Timeouts"
+    },
 
     { "type": "numeric",
       "title": "Level 1 timeout",
@@ -26,6 +36,42 @@
       "desc": "Time you have to find correct figure",
       "section": "timer",
       "key": "4" },
+
+    {
+        "type": "title",
+        "title": "Sizes"
+    },
+
+    { "type": "bool",
+      "title": "Size 1",
+      "desc": "The biggest size",
+      "section": "sizes",
+      "key": "1" },
+    { "type": "bool",
+      "title": "Size 2",
+      "desc": "",
+      "section": "sizes",
+      "key": "2" },
+    { "type": "bool",
+      "title": "Size 3",
+      "desc": "",
+      "section": "sizes",
+      "key": "3" },
+    { "type": "bool",
+      "title": "Size 4",
+      "desc": "",
+      "section": "sizes",
+      "key": "4" },
+    { "type": "bool",
+      "title": "Size 5",
+      "desc": "The smallest size",
+      "section": "sizes",
+      "key": "5" },
+
+    {
+        "type": "title",
+        "title": "Shapes"
+    },
 
     { "type": "bool",
       "title": "Monsters",

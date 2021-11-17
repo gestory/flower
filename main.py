@@ -12,7 +12,6 @@ from kivy.uix.screenmanager import ScreenManager, Screen, CardTransition
 from kivy.uix.widget import Widget
 
 import csv
-import json
 from glob import glob
 from math import sin, cos, pi
 from random import choice, randint, shuffle
@@ -41,6 +40,7 @@ class Flower(App):
         self.pictures_rel_size = 0.5
         self.step = 0
         self.size = 1
+        self.sizes = []
         self.timings = []
         self.start_level = 1
         self.level = 1
@@ -68,6 +68,14 @@ class Flower(App):
             if self.config.getint('pictures', theme):
                 self.themes.append(theme)
         self.shapes = Shapes(self.themes).shapes
+
+    def _populate_sizes(self):
+        self.sizes = []
+        for size in range(1, 6):
+            if self.config.getint('sizes', str(size)):
+                self.sizes.append(size)
+        self.size = min(self.sizes) if self.sizes else 1
+        self.pictures_rel_size = 0.5 * (0.86 ** (self.size - 1))
 
     def load_top_results(self):
         try:
@@ -98,11 +106,13 @@ class Flower(App):
             self.timings = []
             self.errors = 0
             self.size += 1
-            self.pictures_rel_size *= 0.86
+            while self.size not in self.sizes and self.size < 6:
+                self.size += 1
+            self.pictures_rel_size = 0.5 * (0.86 ** (self.size - 1))
         if self.size == 6:
             self.step = 0
-            self.size = 1
-            self.pictures_rel_size = 0.5
+            self.size = min(self.sizes) if self.sizes else 1
+            self.pictures_rel_size = 0.5 * (0.86 ** (self.size - 1))
             self.level += 1
             if self.level == 5:
                 self.results.append([self.username, self.score])
@@ -122,15 +132,13 @@ class Flower(App):
             'start_level': '1'})
         config.setdefaults('timer', {
             '1': 5, '2': 10, '3': 15, '4': 20})
+        config.setdefaults('sizes', {
+            '1': 1, '2': 1, '3': 1, '4': 1, '5': 1})
         config.setdefaults('pictures', {
             'monsters': 1, 'animals': 1, 'numbers': 1, 'letters': 1})
 
     def build_settings(self, settings):
-        with open("flower.json") as f:
-            json_data = json.load(f)
-        data = json.dumps(json_data)
-        
-        settings.add_json_panel('Flower settings', self.config, data=data)
+        settings.add_json_panel('Settings', self.config, 'settings.json')
 
     def on_config_change(self, config, section, key, value):
         if config is self.config:
@@ -141,12 +149,15 @@ class Flower(App):
                 self.max_times[int(key)] = self.config.getint('timer', key)
             if section == 'pictures':
                 self._populate_shapes()
+            if section == 'sizes':
+                self._populate_sizes()
                 
     def on_score(self, instance, value):
         self.root.current_screen.score.text = str(value)
 
     def on_start(self):
         self._populate_shapes()
+        self._populate_sizes()
     
     def build(self):
         self.start_level = self.config.getint('main', 'start_level')
@@ -237,6 +248,7 @@ class FlowerScreen(BackgroundScreen):
             return
         app.level = app.start_level
         app.score = 0
+        app.statistics.clear_results()
         app.new_game()
     
     def update_clock(self, dt):

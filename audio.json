@@ -1,0 +1,7 @@
+[
+    { "type": "bool",
+      "title": "Sound",
+      "desc": "",
+      "section": "audio",
+      "key": "sound" }
+]

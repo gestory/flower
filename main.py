@@ -56,6 +56,8 @@ class Flower(App):
         
         self.themes = []
         self.shapes = Shapes().shapes
+        
+        self.sound = 1
 
     @property
     def top_results(self):
@@ -93,7 +95,8 @@ class Flower(App):
 
     def error(self):
         self.errors += 1
-        choice(WRONG_SOUNDS).play()
+        if self.sound:
+            choice(WRONG_SOUNDS).play()
 
     def update_statistics(self, data):
         self.timings.append(data)
@@ -136,9 +139,12 @@ class Flower(App):
             '1': 1, '2': 1, '3': 1, '4': 1, '5': 1})
         config.setdefaults('pictures', {
             'monsters': 1, 'animals': 1, 'numbers': 1, 'letters': 1})
+        config.setdefaults('audio', {
+            'sound': 1})
 
     def build_settings(self, settings):
         settings.add_json_panel('Settings', self.config, 'settings.json')
+        settings.add_json_panel('Audio', self.config, 'audio.json')
 
     def on_config_change(self, config, section, key, value):
         if config is self.config:
@@ -151,6 +157,8 @@ class Flower(App):
                 self._populate_shapes()
             if section == 'sizes':
                 self._populate_sizes()
+            if section == 'audio':
+                self.sound = self.config.getint('audio', 'sound')
                 
     def on_score(self, instance, value):
         self.root.current_screen.score.text = str(value)
@@ -158,6 +166,7 @@ class Flower(App):
     def on_start(self):
         self._populate_shapes()
         self._populate_sizes()
+        self.sound = self.config.getint('audio', 'sound')
     
     def build(self):
         self.start_level = self.config.getint('main', 'start_level')
@@ -365,7 +374,8 @@ class PetalButton(Button):
             exercise_time = time() - app.start_time
             app.update_statistics(exercise_time)
             app.score += (app.max_time - int(exercise_time)) * 2
-            choice(CORRECT_SOUNDS).play()
+            if app.sound:
+                choice(CORRECT_SOUNDS).play()
         else:
             app.error()
         app.new_game()

@@ -71,7 +71,10 @@ class Flower(App):
     @property
     def top_results(self):
         return [[i+1, *result] for i, result in
-                enumerate(sorted(self.results, key=lambda e: e[1], reverse=True)[:10])]
+                enumerate(self._get_top_results())]
+
+    def _get_top_results(self):
+        return sorted(self.results, key=lambda e: e[1], reverse=True)[:10]
 
     def _populate_shapes(self):
         self.themes = []
@@ -100,7 +103,7 @@ class Flower(App):
 
     def save_top_results(self):
         with open('top_scores', 'w', newline='') as top_scores:
-            csv.writer(top_scores).writerows(self.results)
+            csv.writer(top_scores).writerows(self._get_top_results())
 
     def error(self):
         self.errors += 1

@@ -1,6 +1,11 @@
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.config import Config
+
+Config.set('graphics', 'width', 1024)
+Config.set('graphics', 'height', 768)
+Config.set('graphics', 'resizable', False)
+
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.graphics import Color, Ellipse, Line, Rectangle, Triangle
@@ -429,7 +434,5 @@ class PetalButton(Button):
 
 
 if __name__ == "__main__":
-    Window.size = (1024, 768)
     Window.fullscreen = True
-    Config.set('graphics', 'resizable', False)
     Flower().run()

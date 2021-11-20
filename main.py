@@ -1,5 +1,6 @@
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.config import Config
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.graphics import Color, Ellipse, Line, Rectangle, Triangle
@@ -168,7 +169,7 @@ class Flower(App):
             if section == 'audio':
                 self.sound = self.config.getint('audio', 'sound')
             if key == 'fullscreen':
-                pass
+                Window.fullscreen = not Window.fullscreen
             if key == 'hexagonal':
                 self.hexagonal = self.config.getint(section, key)
                 
@@ -179,6 +180,8 @@ class Flower(App):
         self._populate_shapes()
         self._populate_sizes()
         self.sound = self.config.getint('audio', 'sound')
+        Window.fullscreen = self.config.getint('flower', 'fullscreen')
+        self.hexagonal = self.config.getint('flower', 'hexagonal')
     
     def build(self):
         self.start_level = self.config.getint('main', 'start_level')
@@ -428,4 +431,5 @@ class PetalButton(Button):
 if __name__ == "__main__":
     Window.size = (1024, 768)
     Window.fullscreen = True
+    Config.set('graphics', 'resizable', False)
     Flower().run()

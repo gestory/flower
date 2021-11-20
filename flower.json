@@ -1,0 +1,13 @@
+[
+    { "type": "bool",
+      "title": "Fullscreen",
+      "desc": "Switch between fullscreen and windowed modes",
+      "section": "flower",
+      "key": "fullscreen" },
+
+    { "type": "bool",
+      "title": "Hexagonal petals",
+      "desc": "Switch between hexagonal and circle petals",
+      "section": "flower",
+      "key": "hexagonal" }
+]

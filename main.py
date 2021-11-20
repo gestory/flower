@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
-from kivy.graphics import Color, Ellipse, Rectangle
+from kivy.graphics import Color, Ellipse, Line, Rectangle, Triangle
 from kivy.properties import ListProperty, NumericProperty, ObjectProperty, StringProperty
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
@@ -56,9 +56,11 @@ class Flower(App):
         
         self.themes = []
         self.shapes = Shapes().shapes
-        self.update_colors = False
+        self.update_colors = True
         
         self.sound = 1
+        
+        self.hexagonal = 1
 
     @property
     def top_results(self):
@@ -144,10 +146,13 @@ class Flower(App):
             'monsters': 1, 'animals': 1, 'numbers': 1, 'letters': 1})
         config.setdefaults('audio', {
             'sound': 1})
+        config.setdefaults('flower', {
+            'fullscreen': 1, 'hexagonal': 1})
 
     def build_settings(self, settings):
         settings.add_json_panel('Settings', self.config, 'settings.json')
         settings.add_json_panel('Audio', self.config, 'audio.json')
+        settings.add_json_panel('Other', self.config, 'flower.json')
 
     def on_config_change(self, config, section, key, value):
         if config is self.config:
@@ -162,6 +167,10 @@ class Flower(App):
                 self._populate_sizes()
             if section == 'audio':
                 self.sound = self.config.getint('audio', 'sound')
+            if key == 'fullscreen':
+                pass
+            if key == 'hexagonal':
+                self.hexagonal = self.config.getint(section, key)
                 
     def on_score(self, instance, value):
         self.root.current_screen.score.text = str(value)
@@ -311,7 +320,6 @@ class Petal(FloatLayout):
     def __init__(self, index=-1, **kwargs):
         super(Petal, self).__init__()
         self.index = index
-        self.canvas.before.clear()
         self.button = PetalButton(**kwargs)
         self.pos = self.button.pos
         self.add_widget(self.button)
@@ -333,10 +341,26 @@ class PetalButton(Button):
         return pictures
     
     def update_background_color(self):
+        app = App.get_running_app()
         self.canvas.before.clear()
-        with self.canvas.before:
-            Color(*choice(self.colors))
-            Ellipse(pos=self.parent.pos, size=(self.size[0] * 1.4, self.size[1] * 1.4))
+        if app.hexagonal:
+            hex_vertexes = []
+            for i in range(6):
+                angle_deg = 60 * i - 30
+                angle_rad = pi / 180 * angle_deg
+                hex_vertexes += [self.center[0] + 32 + self.size[0] * 0.9 * cos(angle_rad),
+                                 self.center[1] + 32 + self.size[1] * 0.8 * sin(angle_rad)]
+            with self.canvas.before:
+                Color(*choice(self.colors))
+                for i in range(-2, 4):
+                    Triangle(points=[*self.center, hex_vertexes[2*i], hex_vertexes[2*i + 1],
+                                     hex_vertexes[2*i + 2], hex_vertexes[2*i + 3]])
+                Color(0, 0, 0)
+                Line(points=hex_vertexes, close=True, width=2)
+        else:
+            with self.canvas.before:
+                Color(*choice(self.colors))
+                Ellipse(pos=self.parent.pos, size=(self.size[0] * 1.4, self.size[1] * 1.4))
     
     def draw_several_pictures(self, app, size, quantity, radius=1):
         if app.key_petal == self.parent.index:

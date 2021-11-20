@@ -2,8 +2,8 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
-from kivy.graphics import Color, Rectangle
-from kivy.properties import NumericProperty, ObjectProperty, StringProperty
+from kivy.graphics import Color, Ellipse, Rectangle
+from kivy.properties import ListProperty, NumericProperty, ObjectProperty, StringProperty
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
@@ -56,6 +56,7 @@ class Flower(App):
         
         self.themes = []
         self.shapes = Shapes().shapes
+        self.update_colors = False
         
         self.sound = 1
 
@@ -105,6 +106,7 @@ class Flower(App):
         self.root.current_screen.clock_event.cancel()
         self.max_time = self.max_times[self.level]
         if self.step and not self.step % 5:
+            self.update_colors = True
             self.statistics.update(self.level, self.size, self.timings, self.errors)
             self.timings = []
             self.errors = 0
@@ -127,8 +129,9 @@ class Flower(App):
             self.root.current = 'congrats'
             return
         self.root.current_screen.clock_event = Clock.schedule_interval(self.root.current_screen.update_clock, 1)
-        self.root.current_screen.root.new_game()
+        self.root.current_screen.root.new_game(self.update_colors)
         self.step += 1
+        self.update_colors = False
 
     def build_config(self, config):
         config.setdefaults('main', {
@@ -266,7 +269,7 @@ class FlowerScreen(BackgroundScreen):
         self.timer.value = app.current_time / app.max_time
         if app.current_time <= 0:
             app.error()
-            self.root.new_game()
+            app.new_game()
 
 
 class Timer(Widget):
@@ -287,7 +290,7 @@ class Score(Label):
 
 
 class RootLayout(FloatLayout):
-    def new_game(self):
+    def new_game(self, update_colors=False):
         app = App.get_running_app()
         app.current_time = app.max_time
         self.parent.timer.value = 1.0
@@ -296,7 +299,7 @@ class RootLayout(FloatLayout):
         app.decoys = set(app.shapes).difference([app.shapes[app.key]])
         app.start_time = time()
         for children in self.children:
-            children.new_game()
+            children.new_game(update_colors)
 
 
 class Petal(FloatLayout):
@@ -308,17 +311,27 @@ class Petal(FloatLayout):
         self.pos = self.button.pos
         self.add_widget(self.button)
 
-    def new_game(self):
-        self.button.new_game()
+    def new_game(self, update_colors=False):
+        self.button.new_game(update_colors)
     
     
 class PetalButton(Button):
+    colors = ListProperty([(0, 1, 1),
+                           (1, 1, 0),
+                           (1, 0, 1)])
+    
     @staticmethod
     def get_pictures(decoys, quantity):
         pictures = []
         for i in range(quantity):
             pictures.append(choice(decoys))
         return pictures
+    
+    def update_background_color(self):
+        self.canvas.before.clear()
+        with self.canvas.before:
+            Color(*choice(self.colors))
+            Ellipse(pos=self.parent.pos, size=(self.size[0] * 1.4, self.size[1] * 1.4))
     
     def draw_several_pictures(self, app, size, quantity, radius=1):
         if app.key_petal == self.parent.index:
@@ -350,14 +363,16 @@ class PetalButton(Button):
         size = [d * .75 for d in size]
         self.draw_several_pictures(app, size, 10, app.pictures_rel_size)
     
-    def new_game(self):
+    def new_game(self, update_colors=False):
         app = App.get_running_app()
         size = (app.pictures_rel_size*self.width, app.pictures_rel_size*self.height)
         self.canvas.clear()
+        if update_colors:
+            self.update_background_color()
         if self.parent.index == -1:
             with self.canvas:
                 self.bg = Rectangle(source=app.shapes[app.key], pos=(32-size[0]/2 + self.center[0],
-                                                                  32-size[1]/2 + self.center[1]), size=size)
+                                                                     32-size[1]/2 + self.center[1]), size=size)
         else:
             if app.level == 1:
                 self.draw_one_picture(app, size)

@@ -29,7 +29,7 @@
         padding: 128
         spacing: 48
         Label:
-            text: 'The Flower'
+            text: 'The Flower 0.8'
         Button:
             text: 'Start'
             on_press:
@@ -160,7 +160,7 @@
     background_color: 0, 0, 0, 0
     canvas.before:
         Color:
-            rgb: (random.random(), random.random(), random.random())
+            rgb: (random.choice(self.colors))
         Ellipse:
             pos: root.pos
             size: root.size[0] * 1.4, root.size[1] * 1.4

@@ -183,6 +183,7 @@ class Flower(App):
         
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(StartScreen(name='start'))
+        sm.add_widget(AboutScreen(name='about'))
         sm.add_widget(HallOfFameScreen(name='hall_of_fame'))
         sm.add_widget(FlowerScreen(name='flower'))
         sm.add_widget(CongratsScreen(name='congrats'))
@@ -200,6 +201,10 @@ class MenuScreen(BackgroundScreen):
 
 
 class StartScreen(BackgroundScreen):
+    pass
+
+
+class AboutScreen(BackgroundScreen):
     pass
 
 

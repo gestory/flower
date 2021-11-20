@@ -46,6 +46,9 @@
                 app.open_settings()
         Button:
             text: 'About'
+            on_press:
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'about'
         Button:
             text: 'Exit'
             on_press:
@@ -97,6 +100,16 @@
             on_press:
                 root.manager.transition.direction = 'right'
                 root.manager.current = 'menu'
+
+<AboutScreen>:
+    Label:
+        text: "About the program"
+    Button:
+        text: "Back to menu"
+        size_hint: (1, .1)
+        on_press:
+            root.manager.transition.direction = 'right'
+            root.manager.current = 'menu'
 
 <CongratsScreen>:
     BoxLayout:

@@ -1,5 +1,6 @@
 #:import random random
 #:import os os
+#:import tr __main__.tr
 
 <BackgroundColor@Widget>
     background_color: 1, 1, 1, 1
@@ -28,31 +29,45 @@
         size_hint: (.5, 1)
         padding: 128
         spacing: 32
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 16
+            Button:
+                text: 'Русский'
+                on_press:
+                    app.lang = 'ru'
+            Button:
+                text: 'English'
+                on_press:
+                    app.lang = 'en'
         Label:
-            text: 'The Flower 0.8'
+            text: tr._('The Flower')
         Button:
-            text: 'Start'
+            text: tr._('Start')
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'start'
         Button:
-            text: "Hall of Fame"
+            text: tr._("Hall of Fame")
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'hall_of_fame'
         Button:
-            text: 'Settings'
+            text: tr._('Settings')
             on_press:
                 app.open_settings()
         Button:
-            text: 'About'
+            text: tr._('About')
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'about'
         Button:
-            text: 'Exit'
+            text: tr._('Exit')
             on_press:
                 app.stop()
+    Label:
+        size_hint: (.1, .1)
+        text: 'v.0.91'
 
 <StartScreen>:
     BoxLayout:
@@ -61,21 +76,21 @@
         padding: 128
         spacing: 32
         Label:
-            text: "Please select an existed user or add a new one.\nIt is recommended to try first with a healthy eye\nto have results you can keep as a goal for a lazy eye."
+            text: tr._("It is recommended to try first with a healthy eye\nto have results you can keep as a goal for a lazy eye.")
         Label:
-            text: "Enter your name:"
+            text: tr._("Enter your name:")
         TextInput:
             id: username
             text: os.getenv('USER', 'Neznayka')
             multiline: False
         Label:
-            text: "Choose training condition:"
+            text: tr._("Choose training condition:")
         Spinner:
             id: condition
-            text: 'Both eyes'
-            values: 'Both eyes', 'Left eye', 'Right eye'
+            text: tr._('Both eyes')
+            values: tr._('Both eyes'), tr._('Left eye'), tr._('Right eye')
         Button:
-            text: 'Start'
+            text: tr._('Start')
             on_press:
                 app.username = username.text
                 app.condition = condition.text
@@ -86,7 +101,7 @@
     BoxLayout:
         orientation: 'vertical'
         Button:
-            text: "Hall of Fame"
+            text: tr._("Hall of Fame")
             size_hint: (1, .1)
         GridLayout:
             id: hall_of_fame
@@ -95,7 +110,7 @@
             cols: 3
             rows: 10
         Button:
-            text: "Back to menu"
+            text: tr._("Back to menu")
             size_hint: (1, .1)
             on_press:
                 root.manager.transition.direction = 'right'
@@ -103,9 +118,9 @@
 
 <AboutScreen>:
     Label:
-        text: "About the program"
+        text: tr._("About the program")
     Button:
-        text: "Back to menu"
+        text: tr._("Back to menu")
         size_hint: (1, .1)
         on_press:
             root.manager.transition.direction = 'right'
@@ -115,12 +130,12 @@
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: "Congratulation, {}!".format(app.username)
+            text: tr._("Congratulation, ") + app.username + "!"
         Label:
             text:
-                'Your current score is ' + str(app.score)
+                tr._('Your current score is ') + str(app.score)
         Button:
-            text: "Next level"
+            text: tr._("Next level")
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'flower'
@@ -132,7 +147,7 @@
             orientation: 'vertical'
             id: main
             BackgroundLabel:
-                text: 'Results of ' + app.username + " (" + app.condition + ")"
+                text: tr._('Results of ') + app.username + " (" + app.condition + ")"
                 size_hint: (1, .1)
             GridLayout:
                 id: results
@@ -142,7 +157,7 @@
                 orientation: 'horizontal'
                 size_hint: (1, .1)
                 BackgroundLabel:
-                    text: "Final score: " + str(app.score)
+                    text: tr._("Final score: ") + str(app.score)
                     size_hint: (.5, 1)
                 BackgroundLabel:
                     id: k1
@@ -157,13 +172,13 @@
             orientation: 'horizontal'
             size_hint: (1, .1)
             Button:
-                text: "Save results and return to menu"
+                text: tr._("Save results and return to menu")
                 on_press:
                     main.export_to_png(os.path.join("results", app.username + "_results.png"))
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'menu'
             Button:
-                text: "Back to menu"
+                text: tr._("Back to menu")
                 on_press:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'menu'

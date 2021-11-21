@@ -18,6 +18,12 @@ Run the app
 
 `python main.py`
 
+## Translation to other languages
+
+To work with translation you need `gettext` package.
+
+Use `update_po.sh` to update strings to be translated. After translation, update translations using `update_mo.sh`
+
 ## Thanks for media files
 
 All sounds: http://gcompris.net/

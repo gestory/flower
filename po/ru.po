@@ -1,0 +1,90 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2021-11-21 17:50+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: flower.kv:44
+msgid "The Flower"
+msgstr "Цветок"
+
+#: flower.kv:46 flower.kv:93
+msgid "Start"
+msgstr "Начать"
+
+#: flower.kv:51 flower.kv:104
+msgid "Hall of Fame"
+msgstr "Таблица рекордов"
+
+#: flower.kv:56
+msgid "Settings"
+msgstr "Настройки"
+
+#: flower.kv:60
+msgid "About"
+msgstr "О программе"
+
+#: flower.kv:65
+msgid "Exit"
+msgstr "Выход"
+
+#: flower.kv:79
+msgid ""
+"It is recommended to try first with a healthy eye\n"
+"to have results you can keep as a goal for a lazy eye."
+msgstr ""
+"В первый раз рекомендуется пройти игру используя здоровый глаз\n"
+"чтобы использовать эти результаты как цель для ленивого глаза."
+
+#: flower.kv:81
+msgid "Enter your name:"
+msgstr "Введите ваше имя:"
+
+#: flower.kv:87
+msgid "Choose training condition:"
+msgstr "Выберите условия тренировки"
+
+#: flower.kv:90 flower.kv:91
+msgid "Both eyes"
+msgstr "Оба глаза"
+
+#: flower.kv:91
+msgid "Left eye"
+msgstr "Левый глаз"
+
+#: flower.kv:91
+msgid "Right eye"
+msgstr "Правый глаз"
+
+#: flower.kv:113 flower.kv:123 flower.kv:181
+msgid "Back to menu"
+msgstr "Назад"
+
+#: flower.kv:121
+msgid "About the program"
+msgstr "О программе"
+
+#: flower.kv:133
+msgid "Congratulation, "
+msgstr "Поздравляем, "
+
+#: flower.kv:136
+msgid "Your current score is "
+msgstr "Текущий счёт: "
+
+#: flower.kv:138
+msgid "Next level"
+msgstr "Следующий уровень"
+
+#: flower.kv:150
+msgid "Results of "
+msgstr "Результаты "
+
+#: flower.kv:160
+msgid "Final score: "
+msgstr "Итоговый счёт: "
+
+#: flower.kv:175
+msgid "Save results and return to menu"
+msgstr "Сохранить результаты и вернуться в меню"

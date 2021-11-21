@@ -23,6 +23,7 @@ from math import sin, cos, pi
 from random import choice, randint, shuffle
 from time import time
 
+from lang import Lang
 from shapes import Shapes
 from statistics import Statistics
 
@@ -30,14 +31,17 @@ from statistics import Statistics
 CORRECT_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'correct' in sound]
 WRONG_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'wrong' in sound]
 
+tr = Lang('en')
+
 
 class Flower(App):
-    use_kivy_settings = False
-    score = NumericProperty(0)
-    username = StringProperty('')
     condition = StringProperty('')
+    lang = StringProperty('en')
+    score = NumericProperty(0)
     texture = ObjectProperty()
-    
+    use_kivy_settings = False
+    username = StringProperty('')
+
     def __init__(self, **kwargs):
         super(Flower, self).__init__(**kwargs)
         self.key = None
@@ -162,6 +166,10 @@ class Flower(App):
         settings.add_json_panel('Settings', self.config, 'settings.json')
         settings.add_json_panel('Audio', self.config, 'audio.json')
         settings.add_json_panel('Other', self.config, 'flower.json')
+
+    @staticmethod
+    def on_lang(instance, lang):
+        tr.switch_lang(lang)
 
     def on_config_change(self, config, section, key, value):
         if config is self.config:

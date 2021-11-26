@@ -28,8 +28,8 @@ from shapes import Shapes
 from statistics import Statistics
 
 
-CORRECT_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'correct' in sound]
-WRONG_SOUNDS = [SoundLoader.load(sound) for sound in glob('./sounds/*') if 'wrong' in sound]
+CORRECT_SOUNDS = [SoundLoader.load(sound) for sound in glob('./data/sounds/*') if 'correct' in sound]
+WRONG_SOUNDS = [SoundLoader.load(sound) for sound in glob('./data/sounds/*') if 'wrong' in sound]
 
 tr = Lang('en')
 
@@ -203,7 +203,7 @@ class Flower(App):
         self.start_level = self.config.getint('main', 'start_level')
         self.max_time = self.config.getint('timer', str(self.start_level))
         
-        self.texture = Image(source='images/green_tile.png').texture
+        self.texture = Image(source='./data/images/green_tile.png').texture
         self.texture.wrap = 'repeat'
         self.texture.uvsize = (8, 6)
         

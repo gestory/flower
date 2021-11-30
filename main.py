@@ -203,9 +203,9 @@ class Flower(App):
         self.start_level = self.config.getint('main', 'start_level')
         self.max_time = self.config.getint('timer', str(self.start_level))
         
-        self.texture = Image(source='./data/images/green_tile.png').texture
+        self.texture = Image(source='./data/images/flower_tile.jpg').texture
         self.texture.wrap = 'repeat'
-        self.texture.uvsize = (8, 6)
+        self.texture.uvsize = (3, 2)
         
         sm = ScreenManager(transition=CardTransition())
         
@@ -274,8 +274,8 @@ class FlowerScreen(BackgroundScreen):
         self.root.add_widget(Petal(size_hint=(.16, .24), pos=self.root.center))
         quantity = 6
         for i in range(quantity):
-            x = self.root.center[0] + self.root.width*cos(2*pi*i/quantity) * 0.4
-            y = self.root.center[1] + self.root.height*sin(2*pi*i/quantity) * 0.4
+            x = self.root.center[0] + self.root.width*cos(2*pi*i/quantity) * 0.414
+            y = self.root.center[1] + self.root.height*sin(2*pi*i/quantity) * 0.414
             self.root.add_widget(Petal(index=i, size_hint=(.16, .24), pos=(x, y)))
         self.add_widget(self.root)
 
@@ -339,7 +339,10 @@ class Petal(FloatLayout):
     def __init__(self, index=-1, **kwargs):
         super(Petal, self).__init__()
         self.index = index
-        self.button = PetalButton(**kwargs)
+        if index == -1:
+            self.button = CentralPetalButton(**kwargs)
+        else:
+            self.button = PetalButton(**kwargs)
         self.pos = self.button.pos
         self.add_widget(self.button)
 
@@ -349,8 +352,14 @@ class Petal(FloatLayout):
     
 class PetalButton(Button):
     colors = ListProperty([(0, 1, 1),
-                           (1, 1, 0),
-                           (1, 0, 1)])
+                           (.8, .8, 0.4),
+                           (1, 0, 1),
+                           (.9, .5, .2),
+                           (.3, .7, .7),
+                           (.3, .5, .7),
+                           (.5, .5, .7),
+                           (.8, .3, .7),
+                           ])
     
     @staticmethod
     def get_pictures(decoys, quantity):
@@ -374,7 +383,7 @@ class PetalButton(Button):
                 for i in range(-2, 4):
                     Triangle(points=[*self.center, hex_vertexes[2*i], hex_vertexes[2*i + 1],
                                      hex_vertexes[2*i + 2], hex_vertexes[2*i + 3]])
-                Color(0, 0, 0)
+                Color(1, 1, 1)
                 Line(points=hex_vertexes, close=True, width=2)
         else:
             with self.canvas.before:
@@ -442,6 +451,13 @@ class PetalButton(Button):
         else:
             app.error()
         app.new_game()
+
+
+class CentralPetalButton(PetalButton):
+    colors = ListProperty([(1, 1, 1)])
+
+    def on_press(self):
+        pass
 
 
 if __name__ == "__main__":

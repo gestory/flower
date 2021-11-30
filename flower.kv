@@ -14,6 +14,9 @@
 <BackgroundLabel@Label+BackgroundColor>
     background_color: .4, .4, .3, 1
 
+<MenuButton@Button>
+    background_color: 0, 0, 0, 0.5
+
 <BackgroundScreen@Screen>:
     canvas.before:
         Color:
@@ -31,43 +34,47 @@
         spacing: 32
         BoxLayout:
             orientation: 'horizontal'
-            spacing: 16
+            spacing: 32
+            size_hint: (1, 2)
             Button:
-                text: 'Русский'
+                background_normal: 'data/images/ru.png'
                 on_press:
                     app.lang = 'ru'
             Button:
-                text: 'English'
+                background_normal: 'data/images/en.png'
                 on_press:
                     app.lang = 'en'
         Label:
+            color: 0, .5, 0
+            font_size: '32sp'
             text: tr._('The Flower')
-        Button:
+        MenuButton:
             text: tr._('Start')
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'start'
-        Button:
+        MenuButton:
             text: tr._("Hall of Fame")
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'hall_of_fame'
-        Button:
+        MenuButton:
             text: tr._('Settings')
             on_press:
                 app.open_settings()
-        Button:
+        MenuButton:
             text: tr._('About')
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'about'
-        Button:
+        MenuButton:
             text: tr._('Exit')
             on_press:
                 app.stop()
     Label:
         size_hint: (.1, .1)
-        text: 'v.0.91'
+        color: 0, 0, 0
+        text: 'v.0.92'
 
 <StartScreen>:
     BoxLayout:
@@ -76,20 +83,28 @@
         padding: 128
         spacing: 32
         Label:
+            color: 0, .5, 0
+            font_size: '16sp'
             text: tr._("It is recommended to try first with a healthy eye\nto have results you can keep as a goal for a lazy eye.")
         Label:
+            color: 0, .5, 0
+            font_size: '16sp'
             text: tr._("Enter your name:")
         TextInput:
             id: username
             text: os.getenv('USER', 'Neznayka')
+            size_hint: (1, .5)
             multiline: False
         Label:
+            color: 0, .5, 0
+            font_size: '16sp'
             text: tr._("Choose training condition:")
         Spinner:
             id: condition
+            background_color: 0, 0, 0, 0.5
             text: tr._('Both eyes')
             values: tr._('Both eyes'), tr._('Left eye'), tr._('Right eye')
-        Button:
+        MenuButton:
             text: tr._('Start')
             on_press:
                 app.username = username.text
@@ -118,6 +133,8 @@
 
 <AboutScreen>:
     Label:
+        color: 0, .5, 0
+        font_size: '16sp'
         text: tr._("About the program")
     Button:
         text: tr._("Back to menu")
@@ -130,10 +147,13 @@
     BoxLayout:
         orientation: 'vertical'
         Label:
+            color: 0, .5, 0
+            font_size: '32sp'
             text: tr._("Congratulation, ") + app.username + "!"
         Label:
-            text:
-                tr._('Your current score is ') + str(app.score)
+            color: 0, .5, 0
+            font_size: '32sp'
+            text: tr._('Your current score is ') + str(app.score)
         Button:
             text: tr._("Next level")
             on_press:
